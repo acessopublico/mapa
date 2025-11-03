@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mapa dos Estágios</title>
+<link href="https://fonts.googleapis.com/css2?family=Khand:wght@400;700&family=Barlow:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link rel="stylesheet" href="https://unpkg.com/aos@2.3.4/dist/aos.css" />
+<style>
+/* ---------- CORES ---------- */
+:root {
+  --color-primary-dark: #263868;     /* Azul Escuro */
+  --color-accent-light: #0096D1;     /* Azul Claro */
+  --color-secondary-alert: #D2AE6D;  /* Ouro/Caramelo */
+  --color-gray: #A9ABAE;             /* Cinza */
+  --color-blue-medium: #006199;      /* Azul Médio */
+  --color-white: #FEFEFE;            /* Branco */
+  --color-black: #000000;            /* Preto */
+  --color-separator: #E0E0E0;
+}
+
+/* ---------- BASE ---------- */
+* {margin:0;padding:0;box-sizing:border-box;transition:all .3s ease-in-out}
+body{
+  font-family: 'Barlow', sans-serif;
+  font-weight: 400;
+  color: var(--color-primary-dark);
+  background: #fff;
+  line-height: 1.6;
+}
+
+/* ---------- TIPOGRAFIA ---------- */
+h3, .summary-title, .estagio-section h4 {
+  font-family: 'Khand', sans-serif;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+.estagio-header h3 {
+  font-size: 1.5rem;
+  margin: 0;
+}
+.summary-title {
+  font-size: 1.1rem;
+  letter-spacing: 0.5px;
+}
+.estagio-section h4 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+.estagio-header p, .reflexao p {
+  font-family: 'Barlow', sans-serif;
+  font-style: italic;
+  font-weight: 400;
+  font-size: 0.9rem;
+  color: #666;
+}
+.estagio-list li {
+  font-family: 'Barlow', sans-serif;
+  font-weight: 400;
+  font-size: 1rem;
+  color: #333;
+}
+.summary-nav a {
+  font-family: 'Barlow', sans-serif;
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+.btn-voltar {
+  font-family: 'Barlow', sans-serif;
+  font-weight: 700;
+}
+
+/* ---------- MAPA DOS ESTÁGIOS ---------- */
+.progress-container{position:fixed;top:0;left:0;width:100%;height:6px;background:#e0e0e0;z-index:1000;display:block}
+.progress-bar{height:100%;background:var(--color-primary-dark);width:0%;transition:width .2s ease}
+.header-summary{background:var(--color-primary-dark);color:#fff;padding:20px 0;position:sticky;top:0;z-index:999;box-shadow:0 2px 10px rgba(0,0,0,.1);display:block}
+.summary-container{max-width:1000px;margin:0 auto;padding:0 15px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:15px}
+.summary-nav{display:flex;gap:12px;flex-wrap:wrap}
+.summary-nav a{
+  color:#fff;
+  text-decoration:none;
+  padding:6px 10px;
+  border-radius:4px;
+  transition:all .3s;
+  white-space:nowrap;
+}
+.summary-nav a:hover,
+.summary-nav a.active{
+  background: var(--color-secondary-alert); /* #D2AE6D */
+  color: #fff !important;
+}
+.mapa-estagios{
+  display:flex;
+  flex-direction:column;
+  gap:30px;
+  max-width:1000px;
+  margin:0 auto;
+  padding:25px 15px 60px; /* Reduzido para botão não ficar muito longe */
+}
+.estagio-card{
+  background:var(--color-white);
+  padding:30px;
+  border-radius:8px;
+  box-shadow:0 4px 12px rgba(0,0,0,.1);
+  transition:all .3s;
+  border-left:5px solid transparent;
+  border-top:1px solid var(--color-separator);
+  scroll-margin-top:120px;
+}
+.estagio-card:hover{
+  transform:translateY(-3px);
+  box-shadow:0 8px 20px rgba(38,56,104,.2);
+  border-left:5px solid var(--color-primary-dark);
+}
+.estagio-header{display:flex;align-items:center;margin-bottom:20px}
+.estagio-icon{
+  background:var(--color-blue-medium);
+  color:#fff;
+  width:50px;height:50px;min-width:50px;
+  border-radius:50%;
+  display:flex;justify-content:center;align-items:center;
+  font-size:1.5rem;margin-right:20px;
+}
+.estagio-section{margin-top:25px;padding-top:15px;border-top:1px dashed var(--color-separator)}
+.estagio-section h4 i{color:var(--color-blue-medium);margin-right:8px}
+.estagio-list{list-style:none;padding-left:0}
+.estagio-list li{position:relative;margin-bottom:8px;padding-left:20px}
+.estagio-list li::before{content:"•";color:var(--color-accent-light);font-weight:bold;position:absolute;left:0}
+.reflexao{margin-top:30px;padding:15px;border-radius:6px;background:#f7fcfb;border:1px solid var(--color-accent-light);font-style:italic}
+.reflexao i{color:var(--color-blue-medium);margin-right:5px}
+.ramificacao-card{border-left-color:var(--color-secondary-alert)}
+.ramificacao-card:hover{box-shadow:0 8px 20px rgba(210,174,109,.4);border-left:5px solid var(--color-secondary-alert)}
+.ramificacao-card .estagio-icon{background:var(--color-secondary-alert);box-shadow:0 0 10px rgba(210,174,109,.5)}
+.ramificacao-card .estagio-icon i{color:#333}
+.ramificacao-card .reflexao{background:#f0f0f0;border-color:var(--color-gray)}
+.ramificacao-card .reflexao i{color:var(--color-primary-dark)}
+
+/* ---------- BOTÃO VOLTAR ---------- */
+.btn-voltar{
+  display:inline-block;
+  background:var(--color-accent-light);
+  color:#fff;
+  border-radius:50px;
+  padding:10px 24px;
+  margin-top:20px;
+  text-decoration:none;
+  font-weight:700;
+  transition:background .3s;
+  box-shadow: 0 2px 6px rgba(0,0,0,.15);
+}
+.btn-voltar:hover{background:var(--color-primary-dark)}
+
+/* ---------- RODAPÉ SIMPLES ---------- */
+footer{
+  background: var(--color-primary-dark);
+  color: #fff;
+  text-align: center;
+  padding: 20px 15px;
+  font-size: 0.9rem;
+  font-family: 'Barlow', sans-serif;
+}
+footer a{
+  color: var(--color-accent-light);
+  text-decoration: none;
+  font-weight: 600;
+}
+footer a:hover{
+  text-decoration: underline;
+}
+
+/* ---------- RESPONSIVO ---------- */
+@media (max-width:768px){
+  .summary-nav{justify-content:center}
+  .summary-title{text-align:center;width:100%}
+  .mapa-estagios{padding-bottom:80px}
+}
+</style>
+</head>
+<body>
+
+<div id="progressContainer" class="progress-container">
+    <div class="progress-bar" id="progressBar"></div>
+</div>
+
+<header class="header-summary" id="mapaHeader">
+    <div class="summary-container">
+        <div class="summary-title">JORNADA DE ADAPTAÇÃO</div>
+        <nav class="summary-nav">
+            <a href="#choque" data-stage="1">Choque</a>
+            <a href="#incerteza" data-stage="2">Incerteza</a>
+            <a href="#negacao" data-stage="3">Negação</a>
+            <a href="#crise" data-stage="4">Crise</a>
+            <a href="#saida" data-stage="ram">Saída da Curva</a>
+            <a href="#aceitacao" data-stage="5">Aceitação</a>
+            <a href="#decisao" data-stage="6">Decisão</a>
+            <a href="#integracao" data-stage="7">Integração</a>
+        </nav>
+    </div>
+</header>
+
+<div class="mapa-estagios">
+    <!-- 1. CHOQUE -->
+    <div class="estagio-card" id="choque" data-aos="fade-right">
+        <div class="estagio-header">
+            <div class="estagio-icon"><i class="fa-solid fa-meteor"></i></div>
+            <div><h3>1. CHOQUE</h3><p>“Fui pego de surpresa”</p></div>
+        </div>
+        <div class="estagio-section">
+            <h4><i class="fa-solid fa-user"></i> Ações Pessoais</h4>
+            <ul class="estagio-list">
+                <li>Respire fundo antes de reagir.</li>
+                <li>Anote o que você sentiu — sem julgamento.</li>
+                <li>Converse com alguém de confiança, apenas para ouvir e organizar pensamentos.</li>
+            </ul>
+        </div>
+        <div class="estagio-section">
+            <h4><i class="fa-solid fa-briefcase"></i> Ações Profissionais</h4>
+            <ul class="estagio-list">
+                <li>Leia o comunicado oficial inteiro antes de tirar conclusões.</li>
+                <li>Liste o que muda e o que não muda no seu trabalho.</li>
+                <li>Participe da primeira explicação ou reunião sobre o tema.</li>
+            </ul>
+        </div>
+        <div class="reflexao"><p><i class="fa-solid fa-brain"></i> Pergunta de reflexão: “O que eu realmente sei — e o que estou apenas supondo?”</p></div>
+    </div>
+
+    <!-- 2. INCERTEZA -->
+    <div class="estagio-card" id="incerteza" data-aos="fade-left">
+        <div class="estagio-header">
+            <div class="estagio-icon"><i class="fa-solid fa-question"></i></div>
+            <div><h3>2. INCERTEZA</h3><p>“Será que vai dar certo?”</p></div>
+        </div>
+        <div class="estagio-section">
+            <h4><i class="fa-solid fa-user"></i> Ações Pessoais</h4>
+            <ul class="estagio-list">
+                <li>Escreva suas dúvidas em vez de deixá-las rodando na cabeça.</li>
+                <li>Procure respostas em fontes oficiais (não no boato).</li>
+                <li>Organize uma rotina mínima para manter equilíbrio.</li>
+            </ul>
+        </div>
+        <div class="estagio-section">
+            <h4><i class="fa-solid fa-briefcase"></i> Ações Profissionais</h4>
+            <ul class="estagio-list">
+                <li>Vá a um plantão tira-dúvidas ou envie uma pergunta objetiva.</li>
+                <li>Teste uma nova ferramenta ou rotina por 15 minutos.</li>
+                <li>Compartilhe 1 dificuldade com seu líder — não espere acumular.</li>
+            </ul>
+        </div>
+        <div class="reflexao"><p><i class="fa-solid fa-brain"></i> Pergunta de reflexão: “Do que eu tenho medo — e o que já posso controlar hoje?”</p></div>
+    </div>
+
+    <!-- 3. NEGAÇÃO -->
+    <div class="estagio-card" id="negacao" data-aos="fade-right">
+        <div class="estagio-header">
+            <div class="estagio-icon"><i class="fa-solid fa-ban"></i></div>
+            <div><h3>3. NEGAÇÃO</h3><p>“Isso não vai funcionar”</p></div>
+        </div>
+        <div class="estagio-section">
+            <h4><i class="fa-solid fa-user"></i> Ações Pessoais</h4>
+            <ul class="estagio-list">
+                <li>Observe se você está defendendo o antigo por hábito, não por resultado.</li>
+                <li>Experimente olhar uma história real de quem já fez diferente.</li>
+                <li>Escreva 1 coisa boa que pode surgir com o novo.</li>
+            </ul>
+        </div>
+        <div class="estagio-section">
+            <h4><i class="fa-solid fa-briefcase"></i> Ações Profissionais</h4>
+            <ul class="estagio-list">
+                <li>Peça para ver na prática (demo, visita, simulação).</li>
+                <li>Compare dados e não opiniões.</li>
+                <li>Teste o novo processo por 1 dia, com curiosidade, não obrigação.</li>
+            </ul>
+        </div>
+        <div class="reflexao"><p><i class="fa-solid fa-brain"></i> Pergunta de reflexão: “O que eu ganho se der certo — e o que perco se eu nem tentar?”</p></div>
+    </div>
+
+    <!-- 4. CRISE -->
+    <div class="estagio-card" id="crise" data-aos="fade-left">
+        <div class="estagio-header">
+            <div class="estagio-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+            <div><h3>4. CRISE</h3><p>“Nada faz sentido”</p></div>
+        </div>
+        <div class="estagio-section">
+            <h4><i class="fa-solid fa-user"></i> Ações Pessoais</h4>
+            <ul class="estagio-list">
+                <li>Faça uma pausa de 2 minutos e nomeie o que sente.</li>
+                <li>Reduza o ritmo — cuide do básico (sono, alimentação, conversa).</li>
+                <li>Escolha 1 coisa pequena para retomar o foco.</li>
+            </ul>
+        </div>
+        <div class="estagio-section">
+            <h4><i class="fa-solid fa-briefcase"></i> Ações Profissionais</h4>
+            <ul class="estagio-list">
+                <li>Faça 1 teste simples na sua rotina (algo que dependa só de você).</li>
+                <li>Peça ajuda ao líder ou mentor de pares.</li>
+                <li>Registre 1 aprendizado, mesmo que o resultado não tenha sido bom.</li>
+            </ul>
+        </div>
+        <div class="reflexao"><p><i class="fa-solid fa-brain"></i> Pergunta de reflexão: “O que posso fazer agora para melhorar 5% o meu dia?”</p></div>
+    </div>
+
+    <!-- RAMIFICAÇÃO -->
+    <div class="estagio-card ramificacao-card" id="saida" data-aos="zoom-in">
+        <div class="estagio-header">
+            <div class="estagio-icon"><i class="fa-solid fa-mask"></i></div>
+            <div><h3>RAMIFICAÇÃO: SAÍDA DA CURVA</h3><p>“Não quero mais saber”</p></div>
+        </div>
+        <div class="estagio-section">
+            <h4><i class="fa-solid fa-user"></i> Ações Pessoais</h4>
+            <ul class="estagio-list">
+                <li>Pare e reflita: o que está me incomodando — a mudança ou o medo de perder o controle?</li>
+                <li>Avalie se ainda faz sentido para você estar neste ambiente.</li>
+            </ul>
+        </div>
+        <div class="estagio-section">
+            <h4><i class="fa-solid fa-briefcase"></i> Ações Profissionais</h4>
+            <ul class="estagio-list">
+                <li>Converse abertamente com seu líder sobre o que está travando.</li>
+                <li>Se decidir sair, saia de forma respeitosa e clara — sem contaminar o time.</li>
+            </ul>
+        </div>
+        <div class="reflexao"><p><i class="fa-solid fa-brain"></i> Pergunta de reflexão: “Quero resolver, resistir ou me afastar?”</p></div>
+    </div>
+
+    <!-- 5. ACEITAÇÃO -->
+    <div class="estagio-card" id="aceitacao" data-aos="fade-right">
+        <div class="estagio-header">
+            <div class="estagio-icon"><i class="fa-solid fa-handshake"></i></div>
+            <div><h3>5. ACEITAÇÃO</h3><p>“Ok, vou tentar”</p></div>
+        </div>
+        <div class="estagio-section">
+            <h4><i class="fa-solid fa-user"></i> Ações Pessoais</h4>
+            <ul class="estagio-list">
+                <li>Escolha 1 comportamento novo e pratique por uma semana.</li>
+                <li>Agradeça a si mesmo por estar tentando — mesmo com medo.</li>
+            </ul>
+        </div>
+        <div class="estagio-section">
+            <h4><i class="fa-solid fa-briefcase"></i> Ações Profissionais</h4>
+            <ul class="estagio-list">
+                <li>Faça o Desafio 7 dias (ex.: usar o sistema, seguir o novo fluxo).</li>
+                <li>Registre 1 coisa que deu certo e 1 que pode melhorar.</li>
+                <li>Compartilhe o aprendizado no grupo ou mural.</li>
+            </ul>
+        </div>
+        <div class="reflexao"><p><i class="fa-solid fa-brain"></i> Pergunta de reflexão: “O que aprendi sobre mim quando tentei?”</p></div>
+    </div>
+
+    <!-- 6. DECISÃO -->
+    <div class="estagio-card" id="decisao" data-aos="fade-left">
+        <div class="estagio-header">
+            <div class="estagio-icon"><i class="fa-solid fa-bullseye"></i></div>
+            <div><h3>6. DECISÃO</h3><p>“Agora entendi como fazer”</p></div>
+        </div>
+        <div class="estagio-section">
+            <h4><i class="fa-solid fa-user"></i> Ações Pessoais</h4>
+            <ul class="estagio-list">
+                <li>Ensine alguém o que você aprendeu.</li>
+                <li>Estabeleça uma nova rotina e mantenha.</li>
+                <li>Observe como sua confiança aumenta com o domínio.</li>
+            </ul>
+        </div>
+        <div class="estagio-section">
+            <h4><i class="fa-solid fa-briefcase"></i> Ações Profissionais</h4>
+            <ul class="estagio-list">
+                <li>Consulte o POP/checklist e veja se você já faz 100%.</li>
+                <li>Sugira uma melhoria prática.</li>
+                <li>Ofereça ajuda a quem ainda está em Incerteza ou Crise.</li>
+            </ul>
+        </div>
+        <div class="reflexao"><p><i class="fa-solid fa-brain"></i> Pergunta de reflexão: “Como posso multiplicar o que aprendi?”</p></div>
+    </div>
+
+    <!-- 7. INTEGRAÇÃO -->
+    <div class="estagio-card" id="integracao" data-aos="fade-right">
+        <div class="estagio-header">
+            <div class="estagio-icon"><i class="fa-solid fa-puzzle-piece"></i></div>
+            <div><h3>7. INTEGRAÇÃO</h3><p>“Agora é natural”</p></div>
+        </div>
+        <div class="estagio-section">
+            <h4><i class="fa-solid fa-user"></i> Ações Pessoais</h4>
+            <ul class="estagio-list">
+                <li>Comemore: você integrou algo novo!</li>
+                <li>Olhe para trás e reconheça sua jornada.</li>
+                <li>Pense no próximo desafio: o que quero aprimorar agora?</li>
+            </ul>
+        </div>
+        <div class="estagio-section">
+            <h4><i class="fa-solid fa-briefcase"></i> Ações Profissionais</h4>
+            <ul class="estagio-list">
+                <li>Documente boas práticas do seu setor.</li>
+                <li>Crie 1 indicador simples de melhoria contínua.</li>
+                <li>Seja exemplo: mostre o caminho a quem ainda está subindo a curva.</li>
+            </ul>
+        </div>
+        <div class="reflexao"><p><i class="fa-solid fa-brain"></i> Pergunta de reflexão: “O que posso ensinar para deixar o time ainda melhor?”</p></div>
+    </div>
+
+    <!-- BOTÃO VOLTAR -->
+    <div style="text-align:center;margin-top:40px">
+        <a href="#" class="btn-voltar" onclick="history.back()">Voltar ao Início</a>
+    </div>
+</div>
+
+<!-- RODAPÉ SIMPLES -->
+<footer>
+    <p>© 2024 BRASFORT | Rumo ao Novo. | <a href="#" onclick="window.scrollTo({top:0,behavior:'smooth'}); return false;">Voltar ao topo</a></p>
+</footer>
+
+<script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+<script>
+    // Progress bar
+    function updateProgressBar(){
+        const winScroll = document.body.scrollTop || document.documentElement.scrollTop,
+              height = document.documentElement.scrollHeight - document.documentElement.clientHeight,
+              scrolled = (winScroll / height) * 100;
+        document.getElementById('progressBar').style.width = scrolled + '%';
+    }
+    window.onscroll = updateProgressBar;
+
+    // AOS + navegação do sumário + destaque ao rolar
+    document.addEventListener('DOMContentLoaded', () => {
+        AOS.init({ once: true, duration: 800 });
+
+        document.querySelectorAll('.summary-nav a').forEach(l => {
+            l.addEventListener('click', e => {
+                e.preventDefault();
+                const t = l.getAttribute('href'), el = document.querySelector(t),
+                      offset = 100, pos = el.getBoundingClientRect().top + window.pageYOffset - offset;
+                window.scrollTo({ top: pos, behavior: 'smooth' });
+                document.querySelectorAll('.summary-nav a').forEach(a => a.classList.remove('active'));
+                l.classList.add('active');
+            });
+        });
+
+        window.addEventListener('scroll', () => {
+            let cur = '';
+            document.querySelectorAll('.estagio-card').forEach(c => {
+                if (c.getBoundingClientRect().top <= 150) cur = c.id;
+            });
+            document.querySelectorAll('.summary-nav a').forEach(a => {
+                a.classList.remove('active');
+                if (a.getAttribute('href') === `#${cur}`) a.classList.add('active');
+            });
+        });
+    });
+</script>
+</body>
+</html>
